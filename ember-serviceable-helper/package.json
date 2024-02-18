@@ -1,6 +1,6 @@
 {
   "name": "ember-serviceable-helper",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "The default blueprint for Embroider v2 addons.",
   "keywords": [
     "ember-addon"
@@ -13,9 +13,9 @@
       "types": "./declarations/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./*": {
-      "types": "./declarations/*.d.ts",
-      "default": "./dist/*.js"
+    "./polaris-experimental": {
+      "types": "./declarations/polaris-experimental.d.ts",
+      "default": "./dist/polaris-experimental.js"
     },
     "./addon-main.js": "./addon-main.cjs"
   },
@@ -52,11 +52,20 @@
     "@embroider/addon-shim": "^1.8.7",
     "decorator-transforms": "^1.0.1"
   },
+  "peerDependencies": {
+    "ember-polaris-service": "^0.5.0"
+  },
+  "peerDependenciesMeta": {
+    "ember-polaris-service": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.23.6",
     "@babel/plugin-transform-typescript": "^7.23.6",
     "@babel/runtime": "^7.17.0",
     "@embroider/addon-dev": "^4.1.0",
+    "@embroider/macros": "^1.13.5",
     "@glint/core": "^1.2.1",
     "@glint/environment-ember-loose": "^1.2.1",
     "@glint/environment-ember-template-imports": "^1.2.1",
@@ -88,6 +97,7 @@
     "@typescript-eslint/parser": "^6.14.0",
     "babel-plugin-ember-template-compilation": "^2.2.1",
     "concurrently": "^8.2.2",
+    "ember-polaris-service": "^0.5.0",
     "ember-template-lint": "^5.13.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -97,7 +107,6 @@
     "prettier": "^3.1.1",
     "prettier-plugin-ember-template-tag": "^1.1.0",
     "rollup": "^4.9.1",
-    "rollup-plugin-copy": "^3.5.0",
     "typescript": "^5.3.3"
   },
   "publishConfig": {
