@@ -170,9 +170,12 @@ typeof formatDate; // "function"
 // Using it as a template helper just works:
 <template>
   Today's date is {{formatDate @date}}
+  {{!-- so would {{format-date @date}} in .hbs --}}
 </template>
 
-// This throws an error, because it needs DI to work
+// We can't just call it directly outside of templates, because the function
+// has DI dependencies.
+
 // Error: cannot call formatDate without a context object; it must be called
 // with a `this` object with an owner
 formatDate(new Date());
