@@ -126,13 +126,13 @@ Enter `ember-serviceable-helper`:
 // app/helpers/format-date.js
 import inject from 'ember-serviceable-helper';
 
-export default inject.service('preferences').into(
-  // The function will be called with a `this` that has the dependencies injected
-  function formatDate(date, options = {}) {
-    const userLocale = this.preferences.locale;
-    return new Intl.DateTimeFormat(userLocale, options).format(date);
-  },
-);
+// The function will be called with a `this` that has the dependencies injected
+function formatDate(date, options = {}) {
+  const userLocale = this.preferences.locale;
+  return new Intl.DateTimeFormat(userLocale, options).format(date);
+}
+
+export default inject.service('preferences').into(formatDate);
 ```
 
 Alternatively:
