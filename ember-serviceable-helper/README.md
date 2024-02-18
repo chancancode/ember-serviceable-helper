@@ -29,7 +29,7 @@ No problem, we will introduce a setting for this and expose it via the existing
 One option would be to accept it as a function argument. The downside is that
 you will have to pass that in wherever and whenever you call this function. The
 point of services in Ember is to consolidate these app-wide global dependencies
-and to automatically inject them into whever it is needed in the app, it would
+and to automatically inject them into whenever it is needed in the app, it would
 be great if we can take advantage of that instead.
 
 Another option would be to use the "class-based helper" API:
@@ -54,13 +54,69 @@ export default class FormatDate extends Helper {
 ```
 
 This works, but the code is now _vastly_ different from the simple function we
-had. The "class-based helper" API is a bit of a legacy feature, it's yet another
+had. This cliff is particular sharp when using TypeScript/Glint:
+
+```ts
+// before
+
+export default function formatDate(
+  date: Date,
+  options: Intl.DateTimeFormatOptions = {},
+): string {
+  const userLocale = navigator.language;
+  return new Intl.DateTimeFormat(userLocale, options).format(date);
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'format-date': typeof formatDate;
+  }
+}
+```
+
+```ts
+// after
+
+import Helper from '@ember/component/helper';
+import { service } from '@ember/service';
+import type PreferencesService from 'my-app/services/preferences';
+
+interface FormatDateSignature {
+  Args: {
+    Positional: [value: Date];
+    Named?: Intl.DateTimeFormatOptions;
+  };
+  Return: string;
+}
+
+export default class FormatDate extends Helper<FormatDateSignature> {
+  @service declare preferences: PreferencesService;
+
+  compute(
+    [value]: FormatDateSignature['Args']['Positional'],
+    options: FormatDateSignature['Args']['Named'] = {},
+  ): string {
+    const userLocale = this.preferences.locale;
+    return new Intl.DateTimeFormat(userLocale, options).format(date);
+  }
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'format-date': typeof FormatDate;
+  }
+}
+```
+
+Eh?
+
+The "class-based helper" API is a bit of a legacy feature, it's yet another
 thing to learn, and it's really meant for helpers that needs to be "stateful",
 which is quite rare, and certainly not the case here.
 
-It is a bit unfortunate that the extra machinery and syntatic noise obfuscated
-the fact that this is still just a plain function that happens to need access
-to some app-wide global state via services.
+It is a bit unfortunate that the extra stateful machinery and syntactic noise
+obfuscated the fact that this is still just a plain function that just happens
+to need access to some app-wide global state via services.
 
 ## Usage
 
@@ -210,12 +266,12 @@ inject
   });
 ```
 
-Just like `@service`, we create lazy getters on the injectsions object (the
+Just like `@service`, we create lazy getters on the injections object (the
 `this` argument), so that service lookup happens lazily on first access and is
 cached thereafter.
 
 Furthermore, the injections object is itself created lazily and cached/reused
-in subsequent invocations of the same funciton. Do not abuse this and use it to
+in subsequent invocations of the same function. Do not abuse this and use it to
 store random properties! If you need your helper to be stateful, just use the
 class-based helper API instead. The injections object is frozen in debug builds
 to prevent this.
@@ -287,10 +343,10 @@ libraries, registering destructors against the owner, etc.
 
 Just keep in mind that this library is really just meant for "upgrading" simple
 plain functions to have access to services, and if you find yourself doing very
-eloborate things with it, consider whether a service or a stateful class-based
-helper would be more appropiate.
+elaborate things with it, consider whether a service or a stateful class-based
+helper would be more appropriate.
 
-Another reason (and the oringal reason) this `build()` API exists is that it
+Another reason (and the original reason) this `build()` API exists is that it
 can sometimes provide better type inference for TypeScript. See the next
 section for details.
 
@@ -326,7 +382,7 @@ TypeScript will make sure it is typed correctly (matching the builder DSL):
 import inject from 'ember-serviceable-helper';
 import PreferencesService from 'my-app/services/preferences';
 
-// Explictly typing the `this` argument
+// Explicitly typing the `this` argument
 export interface FormatDateInjections {
   preferences: PreferencesService;
 }
