@@ -1,5 +1,5 @@
 import type Owner from '@ember/owner';
-import { getOwner } from '@ember/owner';
+import { getOwner, setOwner } from '@ember/owner';
 import type { Registry } from '@ember/service';
 
 import type {
@@ -181,6 +181,8 @@ class Builder<Injections> implements Inject<Injections> {
       for (const defineProperty of properties) {
         defineProperty(owner, injections);
       }
+
+      setOwner(injections, owner);
 
       return Object.freeze(injections) as Injections;
     };

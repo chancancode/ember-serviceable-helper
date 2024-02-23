@@ -1,5 +1,5 @@
 import type { Scope, ServiceFactory } from 'ember-polaris-service';
-import { getScope, lookup } from 'ember-polaris-service';
+import { getScope, setScope, lookup } from 'ember-polaris-service';
 
 import type {
   AnyFunction,
@@ -162,6 +162,8 @@ class Builder<Injections> implements Inject<Injections> {
       for (const defineProperty of properties) {
         defineProperty(scope, injections);
       }
+
+      setScope(injections, scope);
 
       return Object.freeze(injections) as Injections;
     };
